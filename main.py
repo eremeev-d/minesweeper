@@ -33,6 +33,17 @@ class Game:
         self.show_map(self.bomb_map, cls=False)
         sys.exit()
 
+    def check_game_end(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.user_map[i][j] == '#': # Can't win until all cells are open
+                    return
+                if (self.user_map[i][j] == '*') ^ (self.bomb_map[i][j] == 1): # Both conditions are satisfied or both not satisfied
+                    return 
+        self.show_map(self.user_map)
+        print("You win!)")
+        sys.exit()
+
     def show_map(self, map_to_show, cls = True):
         if cls:
             os.system('cls')
@@ -43,6 +54,7 @@ class Game:
             for j in range(self.width):
                 print(map_to_show[i][j], end='')
             print()
+        print("Bombs left: {}".format(self.bombs_left))
         
     def _bombs_around(self, i_cell, j_cell):
         bombs_cnt = 0
@@ -80,9 +92,10 @@ class Game:
             self.open_cell(i_cell, j_cell)
         elif action == "Flag":
             self.flag_cell(i_cell, j_cell)
+        self.check_game_end()
 
 
-game = Game(20, 20, 5)
+game = Game(10, 10, 1)
 while True:
     game.show_map(game.user_map)
     print()
