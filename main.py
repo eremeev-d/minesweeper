@@ -3,13 +3,14 @@ import sys
 import random
 
 class Game:    
-    def __init__(self, width = 5, height = 5, bombs = 5):
+    def __init__(self, height = 5, width = 5, bombs = 5):
         if bombs > width*height:
             print("Too many bombs")
             sys.exit()
-        self.width = width
         self.height = height
+        self.width = width
         self.bombs = bombs
+        self.bombs_left = bombs
         self.bomb_map = self._generate_bomb_map()
         self.user_map = [['#' for _ in range(self.width)] for _ in range(self.height)]
 
@@ -40,7 +41,7 @@ class Game:
                 print(self.user_map[i][j], end='')
             print()
 
-    def show_bomb_map(self, cls = True):
+    def show_bomb_map(self, cls = True): # Merge with show_user_map into show_map(map, cls=True)
         if cls:
             os.system('cls')
         for i in range(self.height-1, -1, -1):
@@ -61,20 +62,35 @@ class Game:
         if self.user_map[i_cell][j_cell] != '#':
             return
         if self.bomb_map[i_cell][j_cell] == 1:
-            self.user_map[i_cell][j_cell] = '*'
             self.game_over()
         self.user_map[i_cell][j_cell] = str(self._bombs_around(i_cell, j_cell))
-
         if self.user_map[i_cell][j_cell] == '0':
             self.open_cell(i_cell, j_cell-1)
             self.open_cell(i_cell, j_cell+1)
             self.open_cell(i_cell-1, j_cell)
             self.open_cell(i_cell+1, j_cell)
 
+    def flag_cell(self, i_cell, j_cell):
+        if self.user_map[i_cell][j_cell] == '#':
+            self.bombs_left -= 1
+            self.user_map[i_cell][j_cell] = '*'
+        elif self.user_map[i_cell][j_cell] == '*':
+            self.bombs_left += 1
+            self.user_map[i_cell][j_cell] = '#'
+
+    def make_move(self, i_cell, j_cell, action):
+        if (i_cell < 0) or (j_cell < 0) or (i_cell >= self.height) or (j_cell >= self.width):
+            return
+        if action == "Open":
+            self.open_cell(i_cell, j_cell)
+        elif action == "Flag":
+            self.flag_cell(i_cell, j_cell)
+
 
 game = Game(10, 10, 5)
 while True:
     game.show_user_map()
     print()
-    i, j = map(int, input().split())
-    game.open_cell(i, j)
+    i, j, action = input().split()
+    i, j = int(i), int(j)
+    game.make_move(i-1, j-1, action)
