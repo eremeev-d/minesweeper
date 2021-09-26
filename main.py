@@ -27,28 +27,23 @@ class Game:
         print("Game over")
         print()
         print("User map:")
-        self.show_user_map(cls=False)
+        self.show_map(self.user_map, cls=False)
         print()
         print("Bomb map:")
-        self.show_bomb_map(cls=False)
+        self.show_map(self.bomb_map, cls=False)
         sys.exit()
 
-    def show_user_map(self, cls = True):
+    def show_map(self, map_to_show, cls = True):
         if cls:
             os.system('cls')
+        print(" "*(len(str(self.height))+1), *map(lambda x: (x%10), range(1, self.width+1)), sep='')
+        print()
         for i in range(self.height-1, -1, -1):
+            print(i+1, end=" "*(1+len(str(self.height))-len(str(i+1))))
             for j in range(self.width):
-                print(self.user_map[i][j], end='')
+                print(map_to_show[i][j], end='')
             print()
-
-    def show_bomb_map(self, cls = True): # Merge with show_user_map into show_map(map, cls=True)
-        if cls:
-            os.system('cls')
-        for i in range(self.height-1, -1, -1):
-            for j in range(self.width):
-                print(self.bomb_map[i][j], end='')
-            print()
-
+        
     def _bombs_around(self, i_cell, j_cell):
         bombs_cnt = 0
         for i in range(max(i_cell-1, 0), min(i_cell+2, self.height)):
@@ -87,9 +82,9 @@ class Game:
             self.flag_cell(i_cell, j_cell)
 
 
-game = Game(10, 10, 5)
+game = Game(20, 20, 5)
 while True:
-    game.show_user_map()
+    game.show_map(game.user_map)
     print()
     i, j, action = input().split()
     i, j = int(i), int(j)
